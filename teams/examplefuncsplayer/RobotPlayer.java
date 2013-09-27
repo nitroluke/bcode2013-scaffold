@@ -10,6 +10,9 @@ import battlecode.common.RobotType;
  * The HQ will spawn soldiers continuously. 
  */
 public class RobotPlayer {
+	/**
+	 * @param rc
+	 */
 	public static void run(RobotController rc) {
 		while (true) {
 			try {
