@@ -2,6 +2,7 @@ package examplefuncsplayer;
 
 import battlecode.common.Direction;
 import battlecode.common.GameConstants;
+import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 
@@ -13,18 +14,28 @@ public class RobotPlayer {
 	/**
 	 * @param rc
 	 */
+	
+	public static int counter = 0;
+	int numEncampments = 0; 
+	static MapLocation[] encampmentLocationArray = null; 
+	
 	public static void run(RobotController rc) {
 		while (true) {
 			try {
 				if (rc.getType() == RobotType.HQ) {
 					if (rc.isActive()) {
 						// Spawn a soldier
+						
 						Direction dir = rc.getLocation().directionTo(rc.senseEnemyHQLocation());
 						if (rc.canMove(dir))
 							rc.spawn(dir);
 					}
 				} else if (rc.getType() == RobotType.SOLDIER) {
 					if (rc.isActive()) {
+						 if(encampmentLocationArray == null){
+							 encampmentLocationArray = rc.senseAllEncampmentSquares();
+						 }
+						//rc.senseAllEncampmentSquares()
 						if (Math.random()<0.005) {
 							// Lay a mine 
 							if(rc.senseMine(rc.getLocation())==null)
@@ -38,7 +49,7 @@ public class RobotPlayer {
 							}
 						}
 					}
-					
+					counter++;
 					if (Math.random()<0.01 && rc.getTeamPower()>5) {
 						// Write the number 5 to a position on the message board corresponding to the robot's ID
 						rc.broadcast(rc.getRobot().getID()%GameConstants.BROADCAST_MAX_CHANNELS, 5);
