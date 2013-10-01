@@ -1,7 +1,6 @@
 package lectureBot;
 
 import battlecode.common.*;
-import battlecode.engine.instrumenter.lang.System;
 
 
 /** The example funcs player is a player meant to demonstrate basic usage of the most common commands.
@@ -13,13 +12,13 @@ public class RobotPlayer {
 	 * @param rc
 	 */
 	
-	public static int counter = 0;
+	static int counter = 0;
 	int numEncampments = 0; 
 	static MapLocation[] encampmentLocationArray = null; 
 //	private static MapLocation [] mineLocations = null;
-	private static RobotController rc;
-	private static MapLocation barracks;
-	private static int radiusSquared = 0;
+	static RobotController rc;
+	static MapLocation barracks;
+	static int radiusSquared = 0;
 	
 	public static void run(RobotController myRC) {
 		rc = myRC;
@@ -27,9 +26,7 @@ public class RobotPlayer {
 		while (true) {
 			try {
 				if (rc.getType() == RobotType.SOLDIER) {
-					radiusSquared = (rc.getMapHeight() + rc.getMapWidth())/2;  // 
 					Robot[] enemyRobots = rc.senseNearbyGameObjects(Robot.class,50000,rc.getTeam().opponent());  //list of enemy robots
-					MapLocation[] minelocations = rc.senseNonAlliedMineLocations(barracks, radiusSquared);
 					if(enemyRobots.length == 0){
 					Clock.getRoundNum();  // gets the round number 
 					if(Clock.getRoundNum() < 250){
@@ -68,15 +65,10 @@ public class RobotPlayer {
 			if(encampmentLocationArray == null){ // find encampments
 				encampmentLocationArray = rc.senseAllEncampmentSquares();
 			}
-//			if(mineLocations == null){
-//				mineLocations = rc.senseNonAlliedMineLocations();
-//			}
 //			if (counter < 10 && rc.senseMine(rc.getLocation()) == null) { // lay mines behind robots
 //				if(rc.senseMine(rc.getLocation())==null)
 //					rc.layMine();
-//				counter++;
-//			}else { 
-		
+
 			// Send all robots to the passed in argument.
 			int dist = rc.getLocation().distanceSquaredTo(whereToGo);
 			if(dist > 0){	//dist > 0 && rc.isActive()
@@ -122,7 +114,8 @@ public class RobotPlayer {
 			if (rc.isActive()) {
 				// Spawn a soldier
 
-				Direction dir = rc.getLocation().directionTo(rc.senseEnemyHQLocation());
+				Direction dir = rc.getLocation().directionTo(rc.senseEnemyHQLocation()); 
+				// spawn robots in the direction of the enemy
 				if (rc.canMove(dir))
 					rc.spawn(dir);
 			}
