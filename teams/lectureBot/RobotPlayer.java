@@ -12,14 +12,11 @@ public class RobotPlayer {
 	 * @param rc
 	 */
 	
-	static int counter = 0;
 	int numEncampments = 0; 
 	static MapLocation[] encampmentLocationArray = null; 
-//	private static MapLocation [] mineLocations = null;
 	static RobotController rc;
 	static MapLocation barracks;
-	static int radiusSquared = 0;
-	
+    int broadcastChannel = 1971;
 	public static void run(RobotController myRC) {
 		rc = myRC;
 		barracks = findBarracks();
@@ -38,8 +35,8 @@ public class RobotPlayer {
 						int closestDist = 50000;
 						MapLocation closestEnemy = null;
 						for(int i = 0; i < enemyRobots.length;i++){
-							Robot arobot = enemyRobots[i];
-							RobotInfo arobotInfo = rc.senseRobotInfo(arobot);
+							Robot enemyBot = enemyRobots[i];
+							RobotInfo arobotInfo = rc.senseRobotInfo(enemyBot);
 							int dist = arobotInfo.location.distanceSquaredTo(rc.getLocation());
 							if(dist < closestDist){
 								closestDist = dist;
@@ -61,10 +58,10 @@ public class RobotPlayer {
 
 	private static void goToLocation(MapLocation whereToGo) throws GameActionException {
 
-		if (rc.isActive()) {
-			if(encampmentLocationArray == null){ // find encampments
-				encampmentLocationArray = rc.senseAllEncampmentSquares();
-			}
+//		if (rc.isActive()) {
+//			if(encampmentLocationArray == null){ // find encampments
+//				encampmentLocationArray = rc.senseAllEncampmentSquares();
+//			}
 //			if (counter < 10 && rc.senseMine(rc.getLocation()) == null) { // lay mines behind robots
 //				if(rc.senseMine(rc.getLocation())==null)
 //					rc.layMine();
@@ -74,8 +71,10 @@ public class RobotPlayer {
 			if(dist > 0){	//dist > 0 && rc.isActive()
 				Direction dir = rc.getLocation().directionTo(whereToGo);
 				Direction curDir = dir;
-				int[] directionOffsets = {0,1,-1,2,-2};
-				lookForDir: for(int d:directionOffsets){
+
+				    int[] directionOffSets = {0,1,-1,2,-2};
+
+				lookForDir: for(int d:directionOffSets){
 					curDir = Direction.values()[(dir.ordinal()+d+8)%8];
 					if(rc.canMove(curDir)){
 						break lookForDir;
@@ -96,7 +95,7 @@ public class RobotPlayer {
 //				// Write the number 5 to a position on the message board corresponding to the robot's ID
 //				rc.broadcast(rc.getRobot().getID()%GameConstants.BROADCAST_MAX_CHANNELS, 5);
 //			}
-		}
+//		}
 
 //	}
 
@@ -111,14 +110,28 @@ public class RobotPlayer {
 
 	public static void HqCommand() throws GameActionException{
 		if (rc.getType() == RobotType.HQ) {
-			if (rc.isActive()) {
+//			if (rc.isActive()) {
 				// Spawn a soldier
 
-				Direction dir = rc.getLocation().directionTo(rc.senseEnemyHQLocation()); 
+			    int[] directionOffSets = {0,1,-1,2,-2};
+
+//			    Team mineSpawn = rc.senseMine(rc.getLocation().add(spawnDir)); 
+				Direction dir = rc.getLocation().directionTo(rc.senseEnemyHQLocation());  // this does not work!
+				Direction spawnDir = dir;
 				// spawn robots in the direction of the enemy
+				if(rc.senseMine(rc.getLocation().add(dir)) != null){
+					lookForDir: for(int d:directionOffSets){
+						spawnDir = Direction.values()[(dir.ordinal()+d+8)%8];
+						if(rc.canMove(spawnDir)){
+							rc.spawn(spawnDir);
+							break lookForDir;
+						}
+					}
+				}
+				
 				if (rc.canMove(dir))
 					rc.spawn(dir);
-			}
+//			}
 		}
 	}
 }
