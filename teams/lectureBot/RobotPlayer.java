@@ -122,15 +122,17 @@ public class RobotPlayer {
 				if(rc.senseMine(rc.getLocation().add(dir)) != null){
 					lookForDir: for(int d:directionOffSets){
 						spawnDir = Direction.values()[(dir.ordinal()+d+8)%8];
-						if(rc.canMove(spawnDir)){
+						if(rc.canMove(spawnDir) && rc.senseMine(rc.getLocation().add(spawnDir)) != null){
+							rc.spawn(Direction.SOUTH);
 							rc.spawn(spawnDir);
 							break lookForDir;
 						}
 					}
 				}
 				
-				if (rc.canMove(dir))
+				if (rc.canMove(dir)){
 					rc.spawn(dir);
+				}
 //			}
 		}
 	}
